@@ -50,12 +50,18 @@ export default function DTCDiagnostics() {
     loadData();
     loadRecentSearches();
   }, []);
-  
+
   useEffect(() => {
     loadData();
     loadRecentSearches();
   }, []);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    loadData();
+    loadRecentSearches();
+  }, []);
+  
   const handleSearch = async (term: string) => {
     setSearchTerm(term);
     if (!term.trim()) {
