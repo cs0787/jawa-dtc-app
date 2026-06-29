@@ -2,6 +2,7 @@
 
 export const dynamic = 'force-static';
 
+
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, Clock, List, AlertCircle } from 'lucide-react';
@@ -22,24 +23,17 @@ export default function DTCDiagnostics() {
   const [allDTCs, setAllDTCs] = useState<DTC[]>([]);
   const [recentSearches, setRecentSearches] = useState<DTC[]>([]);
   const [selectedDTC, setSelectedDTC] = useState<DTC | null>(null);
-  const [loading, setLoading] = useState(false);
   const [view, setView] = useState<'search' | 'all'>('search');
-  const [error, setError] = useState<string>('');
 
-  useEffect(() => {
-    loadData();
-    loadRecentSearches();
-  }, []);
-
+  // 1. Define functions FIRST
   const loadData = async () => {
-    setError('');
     const { data, error: fetchError } = await supabase
       .from('dtc_diagnostics')
       .select('*')
       .order('dtc_code');
 
     if (fetchError) {
-      setError(fetchError.message);
+      console.error(fetchError.message);
       return;
     }
     if (data) setAllDTCs(data);
@@ -50,6 +44,12 @@ export default function DTCDiagnostics() {
     if (saved) setRecentSearches(JSON.parse(saved));
   };
 
+  // 2. Call them in useEffect AFTER they are defined
+  useEffect(() => {
+    loadData();
+    loadRecentSearches();
+  }, []);
+
   const handleSearch = async (term: string) => {
     setSearchTerm(term);
     if (!term.trim()) {
@@ -57,7 +57,6 @@ export default function DTCDiagnostics() {
       return;
     }
 
-    setLoading(true);
     const { data } = await supabase
       .from('dtc_diagnostics')
       .select('*')
@@ -65,7 +64,6 @@ export default function DTCDiagnostics() {
       .order('dtc_code');
 
     setResults(data || []);
-    setLoading(false);
   };
 
   const openDTC = (dtc: DTC) => {
@@ -86,7 +84,6 @@ export default function DTCDiagnostics() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
-      {/* JAWA Style Header */}
       <header className="border-b border-red-900/30 bg-black sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-8 py-5 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -166,7 +163,6 @@ export default function DTCDiagnostics() {
         )}
       </div>
 
-      {/* Enhanced Modal */}
       <AnimatePresence>
         {selectedDTC && (
           <div className="fixed inset-0 bg-black/95 z-[100] flex items-center justify-center p-4">
