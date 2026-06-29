@@ -1,8 +1,10 @@
+
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',           // Important for static export
+  output: 'export',           // For static export (important)
   images: {
-    unoptimized: true,        // Required for GitHub Pages
+    unoptimized: true,        // Required for Vercel + static export
   },
   trailingSlash: true,
 };
