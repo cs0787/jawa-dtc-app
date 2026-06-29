@@ -28,3 +28,12 @@ body {
 .nextjs-dev-indicator {
   display: none !important;
 }
+
+theme: {
+  extend: {
+    fontFamily: {
+      sans: ['var(--font-geist-sans)', 'sans-serif'],
+      mono: ['var(--font-geist-mono)', 'monospace'],
+    },
+  },
+},
