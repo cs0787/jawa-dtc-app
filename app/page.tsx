@@ -45,12 +45,12 @@ export default function DTCDiagnostics() {
   };
 
   // 2. Call them in useEffect AFTER they are defined
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
   useEffect(() => {
+    // eslint-disable-next-line
     loadData();
     loadRecentSearches();
   }, []);
-
 
   const handleSearch = async (term: string) => {
     setSearchTerm(term);
