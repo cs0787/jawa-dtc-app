@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "geist/font/google";
+import { Geist, Geist_Mono } from "geist/font/sans";
 import "./globals.css";
 
 const geistSans = Geist({
