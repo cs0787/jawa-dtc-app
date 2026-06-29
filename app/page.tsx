@@ -45,6 +45,12 @@ export default function DTCDiagnostics() {
   };
 
   // 2. Call them in useEffect AFTER they are defined
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    loadData();
+    loadRecentSearches();
+  }, []);
+  
   useEffect(() => {
     loadData();
     loadRecentSearches();
