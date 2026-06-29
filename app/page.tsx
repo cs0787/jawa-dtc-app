@@ -2,7 +2,6 @@
 
 export const dynamic = 'force-static';
 
-
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, Clock, List, AlertCircle } from 'lucide-react';
@@ -25,7 +24,7 @@ export default function DTCDiagnostics() {
   const [selectedDTC, setSelectedDTC] = useState<DTC | null>(null);
   const [view, setView] = useState<'search' | 'all'>('search');
 
-  // 1. Define functions FIRST
+  // 1. Fetch data from Supabase ONCE when component mounts
   const loadData = async () => {
     const { data, error: fetchError } = await supabase
       .from('dtc_diagnostics')
@@ -44,28 +43,26 @@ export default function DTCDiagnostics() {
     if (saved) setRecentSearches(JSON.parse(saved));
   };
 
-  // 2. Call them in useEffect AFTER they are defined
-
   useEffect(() => {
     // eslint-disable-next-line
     loadData();
     loadRecentSearches();
   }, []);
 
-  const handleSearch = async (term: string) => {
+  // 2. High-performance synchronous local memory search filtering
+  const handleSearch = (term: string) => {
     setSearchTerm(term);
     if (!term.trim()) {
       setResults([]);
       return;
     }
 
-    const { data } = await supabase
-      .from('dtc_diagnostics')
-      .select('*')
-      .ilike('dtc_code', `%${term}%`)
-      .order('dtc_code');
+    // Filter instantly using the data already sitting in your allDTCs array
+    const filtered = allDTCs.filter((dtc) =>
+      dtc.dtc_code.toLowerCase().includes(term.toLowerCase())
+    );
 
-    setResults(data || []);
+    setResults(filtered);
   };
 
   const openDTC = (dtc: DTC) => {
