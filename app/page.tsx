@@ -5,7 +5,7 @@ export const dynamic = 'force-static';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, Clock, List, AlertCircle } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import sql from '../lib/neon';
 
 type DTC = {
   dtc_code: string;
@@ -24,19 +24,14 @@ export default function DTCDiagnostics() {
   const [selectedDTC, setSelectedDTC] = useState<DTC | null>(null);
   const [view, setView] = useState<'search' | 'all'>('search');
 
-  // 1. Fetch data from Supabase ONCE when component mounts
   const loadData = async () => {
-    const { data, error: fetchError } = await supabase
-      .from('dtc_diagnostics')
-      .select('*')
-      .order('dtc_code');
-
-    if (fetchError) {
-      console.error(fetchError.message);
-      return;
-    }
-    if (data) setAllDTCs(data);
-  };
+  try {
+    const data = await sql`SELECT * FROM dtc_diagnostics ORDER BY dtc_code`;
+    setAllDTCs(data);
+  } catch (err) {
+    console.error("Database Error:", err);
+  }
+};
 
   const loadRecentSearches = () => {
     const saved = localStorage.getItem('recentDTCs');
@@ -50,12 +45,25 @@ export default function DTCDiagnostics() {
   }, []);
 
   // 2. High-performance synchronous local memory search filtering
-  const handleSearch = (term: string) => {
-    setSearchTerm(term);
-    if (!term.trim()) {
-      setResults([]);
-      return;
-    }
+  // Replace handleSearch
+const handleSearch = async (term: string) => {
+  setSearchTerm(term);
+  if (!term.trim()) {
+    setResults([]);
+    return;
+  }
+
+  try {
+    const data = await sql`
+      SELECT * FROM dtc_diagnostics 
+      WHERE dtc_code ILIKE ${'%' + term + '%'}
+      ORDER BY dtc_code
+    `;
+    setResults(data);
+  } catch (err) {
+    console.error(err);
+  }
+};
 
     // Filter instantly using the data already sitting in your allDTCs array
     const filtered = allDTCs.filter((dtc) =>
